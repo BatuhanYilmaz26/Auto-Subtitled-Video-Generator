@@ -75,7 +75,7 @@ def change_model(current_size, size):
 @st.cache(allow_output_mutation=True)
 def inference(link, loaded_model, task):
     yt = YouTube(link)
-    path = yt.streams.filter(only_audio=True)[0].download(filename="audio.mp4")
+    path = yt.streams.filter(only_audio=True)[0].download(filename="audio.mp3")
     if task == "Transcribe":
         options = dict(task="transcribe", best_of=5)
         results = loaded_model.transcribe(path, **options)
@@ -184,7 +184,7 @@ def main():
             
             with col4:
                 with st.spinner("Generating Subtitled Video"):
-                    video_with_subs = generate_subtitled_video(video, "audio.mp4", "transcript.srt")
+                    video_with_subs = generate_subtitled_video(video, "audio.mp3", "transcript.srt")
                 st.video(video_with_subs)
                 st.balloons()
             with col8:
@@ -243,7 +243,7 @@ def main():
             
             with col4:
                 with st.spinner("Generating Subtitled Video"):
-                    video_with_subs = generate_subtitled_video(video, "audio.mp4", "transcript.srt")
+                    video_with_subs = generate_subtitled_video(video, "audio.mp3", "transcript.srt")
                 st.video(video_with_subs)
                 st.balloons()
             with col8:
