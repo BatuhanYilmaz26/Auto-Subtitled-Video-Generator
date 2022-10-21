@@ -35,7 +35,7 @@ current_size = "None"
 
 col1, col2 = st.columns([1, 3])
 with col1:
-    lottie = load_lottieurl("https://assets8.lottiefiles.com/packages/lf20_jh9gfdye.json")
+    lottie = load_lottieurl("https://assets1.lottiefiles.com/packages/lf20_HjK9Ol.json")
     st_lottie(lottie, speed=1, height=250, width=250)
 
 with col2:
