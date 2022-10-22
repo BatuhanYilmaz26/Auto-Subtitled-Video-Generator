@@ -153,18 +153,18 @@ def main():
             with open(os.path.join(os.getcwd(), "transcript.txt"), "rb") as f:
                 datatxt = f.read()
                 
-
-                with open("transcript.vtt", "w+",encoding='utf8') as f:
-                    f.writelines(results[1])
-                    f.close()
-                with open(os.path.join(os.getcwd(), "transcript.vtt"), "rb") as f:
-                    datavtt = f.read()
+            with open("transcript.vtt", "w+",encoding='utf8') as f:
+                f.writelines(results[1])
+                f.close()
+            with open(os.path.join(os.getcwd(), "transcript.vtt"), "rb") as f:
+                datavtt = f.read()
                 
-                with open("transcript.srt", "w+",encoding='utf8') as f:
-                    f.writelines(results[2])
-                    f.close()
-                with open(os.path.join(os.getcwd(), "transcript.srt"), "rb") as f:
-                    datasrt = f.read()
+            with open("transcript.srt", "w+",encoding='utf8') as f:
+                f.writelines(results[2])
+                f.close()
+            with open(os.path.join(os.getcwd(), "transcript.srt"), "rb") as f:
+                datasrt = f.read()
+
             with col5:
                 st.download_button(label="Download Transcript (.txt)",
                                 data=datatxt,
@@ -212,7 +212,6 @@ def main():
             with open(os.path.join(os.getcwd(), "transcript.txt"), "rb") as f:
                 datatxt = f.read()
                 
-
             with open("transcript.vtt", "w+",encoding='utf8') as f:
                 f.writelines(results[1])
                 f.close()
