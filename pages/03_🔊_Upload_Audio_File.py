@@ -32,7 +32,7 @@ save_dir.mkdir(exist_ok=True)
 col1, col2 = st.columns([1, 3])
 with col1:
     lottie = load_lottieurl("https://assets1.lottiefiles.com/packages/lf20_1xbk4d2v.json")
-    st_lottie(lottie, speed=1, height=250, width=250)
+    st_lottie(lottie)
 
 with col2:
     st.write("""

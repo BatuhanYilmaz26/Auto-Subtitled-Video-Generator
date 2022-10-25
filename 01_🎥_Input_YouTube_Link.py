@@ -25,7 +25,7 @@ def load_lottieurl(url: str):
 col1, col2 = st.columns([1, 3])
 with col1:
     lottie = load_lottieurl("https://assets8.lottiefiles.com/packages/lf20_jh9gfdye.json")
-    st_lottie(lottie, speed=1, height=250, width=250)
+    st_lottie(lottie)
 
 with col2:
     st.write("""
