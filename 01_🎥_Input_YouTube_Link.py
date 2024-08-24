@@ -1,5 +1,6 @@
 import whisper
-from pytube import YouTube
+from pytubefix import YouTube
+from pytubefix.cli import on_progress
 import requests
 import time
 import streamlit as st
@@ -24,11 +25,11 @@ torch.cuda.is_available()
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 # Model options: tiny, base, small, medium, large
 loaded_model = whisper.load_model("small", device=DEVICE)
+current_size = "None"
 
 
 
 # Define a function that we can use to load lottie files from a link.
-@st.cache(allow_output_mutation=True)
 def load_lottieurl(url: str):
     r = requests.get(url)
     if r.status_code != 200:
@@ -56,22 +57,12 @@ with col2:
     ###### ➠ If you want to transcribe the video in its original language, select the task as "Transcribe"
     ###### ➠ If you want to translate the subtitles to English, select the task as "Translate" 
     ###### I recommend starting with the base model and then experimenting with the larger models, the small and medium models often work well. """)
-    
-
-def populate_metadata(link):
-    yt = YouTube(link)
-    author = yt.author
-    title = yt.title
-    description = yt.description
-    thumbnail = yt.thumbnail_url
-    length = yt.length
-    views = yt.views
-    return author, title, description, thumbnail, length, views
 
 
 def download_video(link):
-    yt = YouTube(link)
-    video = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download()
+    yt = YouTube(link, on_progress_callback=on_progress)
+    ys = yt.streams.get_highest_resolution()
+    video = ys.download(filename=f"{save_dir}/youtube_video.mp4")
     return video
 
 
@@ -79,9 +70,18 @@ def convert(seconds):
     return time.strftime("%H:%M:%S", time.gmtime(seconds))
 
 
+def change_model(current_size, size):
+    if current_size != size:
+        loaded_model = whisper.load_model(size)
+        return loaded_model
+    else:
+        raise Exception("Model size is the same as the current size.")
+
+
 def inference(link, loaded_model, task):
-    yt = YouTube(link)
-    path = yt.streams.filter(only_audio=True)[0].download(filename=f"{save_dir}/audio.mp3")
+    yt = YouTube(link, on_progress_callback=on_progress)
+    ys = yt.streams.get_audio_only()
+    path = ys.download(filename=f"{save_dir}/audio.mp3", mp3=True)
     if task == "Transcribe":
         options = dict(task="transcribe", best_of=5)
         results = loaded_model.transcribe(path, **options)
@@ -131,11 +131,14 @@ def generate_subtitled_video(video, audio, transcript):
     
 
 def main():
+    size = st.selectbox("Select Model Size (The larger the model, the more accurate the transcription will be, but it will take longer)", ["tiny", "base", "small", "medium", "large-v3"], index=1)
+    loaded_model = change_model(current_size, size)
+    st.write(f"Model is {'multilingual' if loaded_model.is_multilingual else 'English-only'} "
+        f"and has {sum(np.prod(p.shape) for p in loaded_model.parameters()):,} parameters.")
     link = st.text_input("YouTube Link (The longer the video, the longer the processing time)", placeholder="Input YouTube link and press enter")
     task = st.selectbox("Select Task", ["Transcribe", "Translate"], index=0)
     if task == "Transcribe":
         if st.button("Transcribe"):
-            author, title, description, thumbnail, length, views = populate_metadata(link)
             with st.spinner("Transcribing the video..."):
                 results = inference(link, loaded_model, task)
             video = download_video(link)
@@ -192,7 +195,6 @@ def main():
             
     elif task == "Translate":
         if st.button("Translate to English"):
-            author, title, description, thumbnail, length, views = populate_metadata(link)
             with st.spinner("Translating to English..."):
                 results = inference(link, loaded_model, task)
             video = download_video(link)
